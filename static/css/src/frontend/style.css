@@ -653,11 +653,9 @@ html .ui-popup-focus .ui-dialog{
 	/** 
 	 * current
 	 */
-	.header-bar .menu-desktop .menu li[class^="current"] > a,
-	.header-bar .menu-desktop .menu li[class*~" current"] > a{
-		color:white;
-		font-weight:bold;
-		text-shadow:0 1px 1px rgba(0,0,0,.5);
+	.header-bar .menu li[class^="current"] > a,
+	.header-bar .menu li[class*=" current"] > a{
+		background: rgba(0,0,0,.1);
 	}
 	.header-bar .menu-desktop .menu > .menu-item-has-children > a{
 		padding-right: 2rem !important;
