@@ -24,13 +24,170 @@ define(function(require, exports, module){
 			// exports.mod_tab.init();
 			setTimeout(function(){exports.qrcode.init();},1000);
 			exports.thumbnail_fix.init();
-			
+			exports.sidebar_float.init();
 			// exports.fixed_box.init();
 			
 		});
 	};
 
+	exports.sidebar_float = {
+		config : {
+			sidebar_id : '.sidebar',
+			main_id : '.main',
+			footer_id : 'body > footer',
+			max_screen_with : 767
+		},
+		sb_ori_left : false,
+		sb_ori_top : false,
+		sb_last_top : false,
+		sb_last_bottom : false,
+		sb_ori_width : false,
+		sb_stop_top : false,
+		init : function(){
+			this.$sb = $(this.config.sidebar_id);
+			if(!this.$sb[0]) return false;
+			this.sb_height =  this.$sb.height();
+			if($(this.config.main_id).height() <= this.sb_height) return false;
+			this.$footer = $(this.config.footer_id);
+			this.footer_top = this.$footer.offset().top;
+			this.sb_ori_left = this.$sb.offset().left;
+			this.sb_ori_top = this.$sb.offset().top;
+			this.sb_ori_width = this.$sb.innerWidth();
+			this.sb_stop_top = this.footer_top - this.sb_height;
+			this.sb_last_top = this.$sb.offset().top;
+			this.sb_last_bottom = this.sb_last_top + this.$sb.height();
+			this.middle_scroll();
+		},
+		middle_scroll : function(){
+			var _this = this,
+				t = 0,
+				p = 0,
+				timer;
+			$(window).scroll(function(){
+				if(_this.is_mobile_screen()) return false;
+				p = $(this).scrollTop();
 
+				//scroll down
+				if(t<=p){
+					_this.middle_scroll_down();
+				//scroll up
+				}else{
+					_this.middle_scroll_up();
+				}
+				setTimeout(function(){
+					t = p;
+				},10);
+			});
+			
+		},
+		is_mobile_screen : function(){
+			if($(window).width() <= this.config.max_screen_with){
+				this.$sb.css({
+					position : 'static',
+					top : '',
+					left : '',
+					bottom : '',
+					width : ''
+				});
+				return true;
+			}else{
+				return false;
+			}
+				
+		},
+		middle_scroll_up : function(){
+			if(!this.sb_last_top) this.sb_last_top = this.$sb.offset().top;
+			//如果滚动到初始状态
+			if($(window).scrollTop() <= this.sb_ori_top){
+				this.$sb.css({
+					position : 'static',
+					left : '',
+					bottom : '',
+					top : '',
+					width : ''
+				});
+				this.sb_last_top = this.$sb.offset().top;
+			//如果窗口顶高 小于 边栏顶高，则浮动
+			}else if($(window).scrollTop() <= this.$sb.offset().top){
+				this.$sb.css({
+					position : 'fixed',
+					top : 0,
+					bottom : '',
+					left : this.sb_ori_left + 'px',
+					width : this.sb_ori_width + 'px'
+					
+				});
+				this.sb_last_top = this.$sb.offset().top;
+			//如果窗口顶高 小于 边栏顶高，则绝对定位
+			}else{
+				this.$sb.css({
+					position : 'absolute',
+					left  : this.sb_ori_left + 'px',
+					bottom : '',
+					top : this.sb_last_top + 'px',
+					width : this.sb_ori_width + 'px'
+				});
+				this.sb_last_top = this.$sb.offset().top;
+			}
+			this.sb_last_bottom = this.sb_last_top + this.$sb.height();
+		},
+		middle_scroll_down : function(){
+			var win_bottom = $(window).height() + $(window).scrollTop();
+			//如果 sb 底高 大于 footer 底高，那么 sb 只会处于 footer 之上
+			if(this.sb_last_bottom >= this.$footer.offset().top){
+				this.$sb.css({
+					position : 'absolute',
+					top : this.sb_last_top + 'px',
+					bottom : '',
+					left : this.sb_ori_left + 'px',
+					width : this.sb_ori_width + 'px'
+				});
+				this.sb_last_bottom = this.$sb.offset().top + this.$sb.height();
+				if(this.sb_last_bottom > this.$footer.offset().top){
+					this.$sb.css({
+						top : this.$footer.offset().top - this.sb_height + 'px'
+					});
+					this.sb_last_bottom = this.$footer.offset().top;
+					this.sb_last_top = this.$footer.offset().top - this.sb_height + 1;
+				}
+			//如果边栏底高 大于 底栏顶高，则边栏最大底高为底栏顶高
+			}else if(this.sb_last_bottom >= this.$footer.offset().top){
+				this.$sb.css({
+					position : 'absolute',
+					left : this.sb_ori_left + 'px',
+					bottom : '',
+					top : this.sb_stop_top + 'px',
+					width : this.sb_ori_width + 'px'
+				});
+				this.sb_last_bottom = this.sb_last_top + this.$sb.height();
+				this.sb_last_top = this.$sb.offset().top;
+			//如果窗口顶高 大于 边栏底高，则边栏随窗口浮动
+			}else if(win_bottom >= this.sb_last_bottom){
+				this.$sb.css({
+					position : 'fixed',
+					left : this.sb_ori_left + 'px',
+					bottom : '0',
+					top : '',
+					width : this.sb_ori_width + 'px'
+				});
+				this.sb_last_bottom = this.sb_last_top + this.$sb.height();
+				this.sb_last_top = this.$sb.offset().top;
+			//如果窗口底高和底栏顶高 小于 边栏底高，则边栏顶高为上次的顶高
+			}else{
+				//如果已经是 fixed
+				if(this.$sb.css('position') === 'fixed'){
+					this.$sb.css({
+						position : 'absolute',
+						top : this.sb_last_top + 'px',
+						bottom : '',
+						left : this.sb_ori_left + 'px',
+						width : this.sb_ori_width + 'px'
+					});
+				}
+			}
+		}
+		
+	};
 	exports.zoom = {
 		that : this,
 		config : {

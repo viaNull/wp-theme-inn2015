@@ -1,4 +1,4 @@
-<div class="widget-area grid-30 tablet-grid-30 mobile-grid-100" role="complementary">
+<div class="sidebar widget-area grid-30 tablet-grid-30 mobile-grid-100" role="complementary">
 	<?php
 	/** 
 	 * home widget

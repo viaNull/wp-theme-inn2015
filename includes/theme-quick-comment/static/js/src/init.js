@@ -540,7 +540,7 @@ define(function(require, exports, module){
 			args['comment_class'].push('comment');
 			var comm_class = args['comment_class'].join(' '),
 				comm_id = args['comment_id'],
-				comm_author_url = args['comment_author']['url'],
+				comm_author_url = args['comment_author']['url'] ? args['comment_author']['url'] : 'javascript:void(0)',
 				comm_author_name = args['comment_author']['name'],
 				comm_author_gravatar = args['comment_author']['gravatar'],
 				comm_content = args['comment_content'],
